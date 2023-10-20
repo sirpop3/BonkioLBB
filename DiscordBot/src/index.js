@@ -34,7 +34,6 @@ client.on("messageCreate", (msg) => {
 const bonkGetRoomsJSON = async () => {
     try {
         const fetchRoomURL = "https://bonk2.io/scripts/getrooms.php";
-
         const fetchRoomHeaders = {
             "accept": "*/*",
             "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
@@ -48,15 +47,12 @@ const bonkGetRoomsJSON = async () => {
             "Referer": "https://bonk.io/",
             "Referrer-Policy": "strict-origin-when-cross-origin"
         }
-
         const fetchRoomData = `version=48&gl=n&token=${bonkLoginToken}`;
-
         const response = await fetch(fetchRoomURL, {
             headers: fetchRoomHeaders,
             body: fetchRoomData,
             method: "POST",
         });
-        
         const responseJSON = await response.json();
         return responseJSON;
     } catch (err) {
@@ -65,11 +61,11 @@ const bonkGetRoomsJSON = async () => {
     }
 }
 
-// Get new login token if expired(using remember token)
+// Get new login token if expired (using remember token)
 const getNewBLT = async () => {
     try {
+        // All game info must be up to-date to fetch
         const fetchRoomURL = "https://bonk2.io/scripts/login_auto.php";
-
         const fetchRoomHeaders = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
             'Accept': '*/*',
@@ -84,9 +80,9 @@ const getNewBLT = async () => {
             'Sec-Fetch-Site': 'cross-site',
             'TE': 'trailers'
         }
-
         const fetchRoomData = `rememberToken=${process.env.BonkRemberToken_LB}`;
 
+        // Fetch request for room data
         const response = await fetch(fetchRoomURL, {
             headers: fetchRoomHeaders,
             body: fetchRoomData,
@@ -101,7 +97,7 @@ const getNewBLT = async () => {
     }
 }
 
-// Print those infos in the channel
+// Prints Room info into Discord Channel
 printBonkPkrRooms = (roomsJSON) => {
     let roomsArray = roomsJSON.rooms;
     
@@ -151,7 +147,7 @@ printBonkPkrRooms = (roomsJSON) => {
 
 sendBonkInfo = async () => {
     let updateMsg = "Sending Bonk Info ";
-    setTimeout(sendBonkInfo, 10000); // too fast and the bot will get rate-limited by the bonk.io server
+    setTimeout(sendBonkInfo, 10000); // too fast and the bot will get rate-limited by the server
     const now = new Date();
     console.log(updateMsg.concat(now.getHours(),":", now.getMinutes(),":", now.getSeconds(),".",now.getMilliseconds()));
     let roomsEmbed = new EmbedBuilder()
@@ -165,7 +161,6 @@ sendBonkInfo = async () => {
     
     try {
         let roomsJSON = await bonkGetRoomsJSON();
-        console.log(JSON.stringify(roomsJSON,null));
         if (roomsJSON.r === 'fail' && roomsJSON.e === 'token') {
             console.log("Token Expired");
             bonkLoginToken = await getNewBLT();
