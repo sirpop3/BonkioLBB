@@ -15,7 +15,7 @@
 <pre id="content" style="white-space: pre-wrap;"></pre>
 
 <script type="text/javascript">
-  //const { initializeApp } = require('firebase-admin/app')
+  // const initializeApp = require('firebase-admin/app')
 
   // Client ID
   const CLIENT_ID = "1012887003532-162lo0v9frfipslikpdlklo21jbd49gt.apps.googleusercontent.com";
@@ -139,7 +139,7 @@
       return;
     }
 
-    
+
     const output = range.values.reduce(
             (str, row) => `${str}${row[0]}, ${row[1]}, ${row[2]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}\n`,
             'NAME, MAPMAKER, MODE, VERSION, MULTIPLAYER, TAS, PROOF OF CONCEPT, PARKOUR TYPE:\n');    // stores mapdata onto firebase
