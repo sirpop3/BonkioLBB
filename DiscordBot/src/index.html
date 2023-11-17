@@ -11,6 +11,7 @@
 <!--Add buttons to initiate auth sequence and sign out-->
 <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
 <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+<button id="mapstore_button" onclick="handleMapStoreClick()">Store Maps</button>
 
 <pre id="content" style="white-space: pre-wrap;"></pre>
 
@@ -20,6 +21,18 @@
   /* exported handleAuthClick */
   /* exported handleSignoutClick */
 
+
+=======
+<script type = "module">
+  import {getFirestore} from "firebase-admin/firestore";
+  const initializeApp = require('firebase-admin/app');
+  //const db = getFirestore(initializeApp);
+  alert('yeep');
+</script>
+
+>>>>>>> Stashed changes
+
+<script>
   // Client ID
   const CLIENT_ID = "1012887003532-162lo0v9frfipslikpdlklo21jbd49gt.apps.googleusercontent.com";
   // API Key
@@ -33,12 +46,14 @@
   // included, separated by spaces.
   const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
+  // Map Data
+  let Data;
+
   let tokenClient;
   let gapiInited = false;
   let gisInited = false;
 
-  // I/O module
-  let fs = require ("fs");
+  let authorized = false;
 
   document.getElementById('authorize_button').style.visibility = 'hidden';
   document.getElementById('signout_button').style.visibility = 'hidden';
@@ -83,6 +98,7 @@
     if (gapiInited && gisInited) {
       document.getElementById('authorize_button').style.visibility = 'visible';
     }
+    document.getElementById('mapstore_button').style.visibility = 'hidden';
   }
 
   /**
@@ -95,7 +111,6 @@
       }
       document.getElementById('signout_button').style.visibility = 'visible';
       document.getElementById('authorize_button').innerText = 'Refresh';
-      await listMaps();
     };
 
     if (gapi.client.getToken() === null) {
@@ -106,6 +121,8 @@
       // Skip display of account chooser and consent dialog for an existing session.
       tokenClient.requestAccessToken({prompt: ''});
     }
+    authorized = true;
+    document.getElementById('mapstore_button').style.visibility = 'visible';
   }
 
   /**
@@ -123,7 +140,14 @@
   }
 
   /**
-   * Stores Map Information:
+   *  Store Map info to Firebase upon button click.
+   */
+  function handleMapStoreClick() {
+    listMaps();
+  }
+
+  /**
+   * Retrieves Map Information:
    */
   async function listMaps() {
     let response;
@@ -138,10 +162,11 @@
       return;
     }
     const range = response.result;
-    if (!range || !range.values || range.values.length == 0) {
+    if (!range || !range.values || range.values.length === 0) {
       document.getElementById('content').innerText = 'No values found.';
       return;
     }
+<<<<<<< Updated upstream
 
     let output = "";
     for (let i = 0; i< range.values.length; i++) {
@@ -149,7 +174,15 @@
     }
     fs.writeFile("maps.txt", )
     document.getElementById('content').innerText = output;
+=======
+    Data = range.values.reduce(
+            (str, row) => `${str}${row[0]}, ${row[1]}, ${row[2]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}\n`,
+            'NAME, MAPMAKER, MODE, VERSION, MULTIPLAYER, TAS, PROOF OF CONCEPT, PARKOUR TYPE:\n');
+
+    document.getElementById('content').innerText = Data;
+>>>>>>> Stashed changes
   }
+
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
