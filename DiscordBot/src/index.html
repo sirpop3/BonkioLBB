@@ -12,8 +12,11 @@
 <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
 <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
 <button id="mapstore_button" onclick="handleMapStoreClick()">Store Maps</button>
+<button id="mapsend_button" onclick="handleMapSendClick()">Send Maps</button>
 
 <pre id="content" style="white-space: pre-wrap;"></pre>
+
+
 
 <script type="text/javascript">
   /* exported gapiLoaded */
@@ -21,18 +24,6 @@
   /* exported handleAuthClick */
   /* exported handleSignoutClick */
 
-
-=======
-<script type = "module">
-  import {getFirestore} from "firebase-admin/firestore";
-  const initializeApp = require('firebase-admin/app');
-  //const db = getFirestore(initializeApp);
-  alert('yeep');
-</script>
-
->>>>>>> Stashed changes
-
-<script>
   // Client ID
   const CLIENT_ID = "1012887003532-162lo0v9frfipslikpdlklo21jbd49gt.apps.googleusercontent.com";
   // API Key
@@ -57,6 +48,8 @@
 
   document.getElementById('authorize_button').style.visibility = 'hidden';
   document.getElementById('signout_button').style.visibility = 'hidden';
+  document.getElementById('mapstore_button').style.visibility = 'hidden';
+  document.getElementById('mapsend_button').style.visibility = 'hidden';
 
   /**
    * Callback after api.js is loaded.
@@ -98,7 +91,6 @@
     if (gapiInited && gisInited) {
       document.getElementById('authorize_button').style.visibility = 'visible';
     }
-    document.getElementById('mapstore_button').style.visibility = 'hidden';
   }
 
   /**
@@ -109,7 +101,6 @@
       if (resp.error !== undefined) {
         throw (resp);
       }
-      document.getElementById('signout_button').style.visibility = 'visible';
       document.getElementById('authorize_button').innerText = 'Refresh';
     };
 
@@ -123,6 +114,8 @@
     }
     authorized = true;
     document.getElementById('mapstore_button').style.visibility = 'visible';
+    document.getElementById('signout_button').style.visibility = 'visible';
+    document.getElementById('mapsend_button').style.visibility = 'visible';
   }
 
   /**
@@ -136,6 +129,8 @@
       document.getElementById('content').innerText = '';
       document.getElementById('authorize_button').innerText = 'Authorize';
       document.getElementById('signout_button').style.visibility = 'hidden';
+      document.getElementById('mapsend_button').style.visibility = 'hidden';
+      document.getElementById('mapstore_button').style.visibility = 'hidden';
     }
   }
 
@@ -152,7 +147,6 @@
   async function listMaps() {
     let response;
     try {
-      // Fetch first 10 files
       response = await gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: "'Map List'!A2:H",
@@ -166,22 +160,24 @@
       document.getElementById('content').innerText = 'No values found.';
       return;
     }
-<<<<<<< Updated upstream
-
     let output = "";
     for (let i = 0; i< range.values.length; i++) {
       output += range.values[i] + '\n';
     }
-    fs.writeFile("maps.txt", )
     document.getElementById('content').innerText = output;
-=======
+
     Data = range.values.reduce(
             (str, row) => `${str}${row[0]}, ${row[1]}, ${row[2]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}\n`,
             'NAME, MAPMAKER, MODE, VERSION, MULTIPLAYER, TAS, PROOF OF CONCEPT, PARKOUR TYPE:\n');
 
     document.getElementById('content').innerText = Data;
->>>>>>> Stashed changes
   }
+
+
+  function handleMapSendClick() {
+    alert("unimplemented");
+  }
+
 
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
