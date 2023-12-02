@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sheets API Quickstart</title>
+  <title>Maps Server Function Test</title>
   <meta charset="utf-8" />
 </head>
 <body>
@@ -10,20 +10,14 @@
 
 <!--Add buttons to initiate auth sequence and sign out-->
 <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-<button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-<button id="mapstore_button" onclick="handleMapStoreClick()">Store Maps</button>
-<button id="mapsend_button" onclick="handleMapSendClick()">Send Maps</button>
+<button id="signout_button" onclick="handleSignOutClick()">Sign Out</button>
+<button id="mapstore_button" onclick="handleMapGetClick()">Get Maps</button>
+<button id="mapsend_button">Send Maps</button>
+<button id="testretrieve_button" onclick="handleTestRetrieveClick()">Test Retrieve sample Blocky Racing</button>
 
 <pre id="content" style="white-space: pre-wrap;"></pre>
 
-
-
-<script type="text/javascript">
-  /* exported gapiLoaded */
-  /* exported gisLoaded */
-  /* exported handleAuthClick */
-  /* exported handleSignoutClick */
-
+<script>
   // Client ID
   const CLIENT_ID = "1012887003532-162lo0v9frfipslikpdlklo21jbd49gt.apps.googleusercontent.com";
   // API Key
@@ -36,9 +30,6 @@
   // Authorization scopes required by the API; multiple scopes can be
   // included, separated by spaces.
   const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
-
-  // Map Data
-  let Data;
 
   let tokenClient;
   let gapiInited = false;
@@ -90,6 +81,9 @@
   function maybeEnableButtons() {
     if (gapiInited && gisInited) {
       document.getElementById('authorize_button').style.visibility = 'visible';
+      document.getElementById('mapstore_button').style.visibility = 'visible';
+      document.getElementById('signout_button').style.visibility = 'visible';
+      document.getElementById('mapsend_button').style.visibility = 'visible';
     }
   }
 
@@ -113,15 +107,12 @@
       tokenClient.requestAccessToken({prompt: ''});
     }
     authorized = true;
-    document.getElementById('mapstore_button').style.visibility = 'visible';
-    document.getElementById('signout_button').style.visibility = 'visible';
-    document.getElementById('mapsend_button').style.visibility = 'visible';
   }
 
   /**
    *  Sign out the user upon button click.
    */
-  function handleSignoutClick() {
+  function handleSignOutClick() {
     const token = gapi.client.getToken();
     if (token !== null) {
       google.accounts.oauth2.revoke(token.access_token);
@@ -137,11 +128,10 @@
   /**
    *  Store Map info to Firebase upon button click.
    */
-  function handleMapStoreClick() {
+  function handleMapGetClick() {
     listMaps();
   }
-
-  /**
+   /**
    * Retrieves Map Information:
    */
   async function listMaps() {
@@ -164,22 +154,81 @@
     for (let i = 0; i< range.values.length; i++) {
       output += range.values[i] + '\n';
     }
-    document.getElementById('content').innerText = output;
-
-    Data = range.values.reduce(
+    window.Data = range.values;   // 2D Array of Strings (entries)
+    let stringData = range.values.reduce(
             (str, row) => `${str}${row[0]}, ${row[1]}, ${row[2]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}\n`,
             'NAME, MAPMAKER, MODE, VERSION, MULTIPLAYER, TAS, PROOF OF CONCEPT, PARKOUR TYPE:\n');
-
-    document.getElementById('content').innerText = Data;
+    document.getElementById('content').innerText = stringData;
+    alert("total maps = " + window.Data.length);
   }
-
-
-  function handleMapSendClick() {
-    alert("unimplemented");
-  }
-
 
 </script>
+
+<script type = "module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import {getFirestore, collection, doc, setDoc, getDocs} from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAka60D6au7Y38SeWIBahUPG5tNcYAXSA8",
+    authDomain: "bonkleaderboard.firebaseapp.com",
+    projectId: "bonkleaderboard",
+    storageBucket: "bonkleaderboard.appspot.com",
+    messagingSenderId: "621980729647",
+    appId: "1:621980729647:web:fa4b5a179f9cdb677161da",
+    measurementId: "G-TJC3N4E459"
+  };
+  const app = initializeApp(firebaseConfig);
+
+  const database = getFirestore(app);
+  /**
+   *   Sends Map Data to Firebase
+   */
+  export function handleMapSendClick() {
+    alert("send start yeep");
+    // create & populate mapName collection
+    const mapNamesRef = collection(database, "mapNames");
+    try {
+      for (let i = 0; i < window.Data.length; i++) {
+        setDoc(doc(mapNamesRef, i.toString()), {
+          mapName: window.Data[i][0]
+        });
+      }
+      setDoc(doc(mapNamesRef, "map count"), { // stores map count at index 0
+        mapCount: window.Data.length
+      });
+    } catch(e) {
+      alert(e);
+    }
+    // create & populate MapData collection
+    const mapDataRef = collection(database, "mapData");
+    try {
+      for (let i = 0; i < window.Data.length; i++) {
+        setDoc(doc(mapDataRef, window.Data[i][0]), {
+          Mapmaker: window.data[i][1],
+          Mode: window.data[i][2],
+          Version: window.data[i][3],
+          Multiplayer: window.data[i][4],
+          TAS: window.data[i][5],
+          Proof_Of_Concept: window.data[i][6],
+          Parkour_Type: window.data[i][7]
+        });
+      }
+    } catch(e) {
+      alert(e);
+    }
+    alert("send end yeep");
+  }
+  // tests retrieval of first 10 maps
+  function handleTestRetrieveClick() {
+    for (let i = 0; i < 10; i++) {
+
+    }
+  }
+  document.getElementById('mapsend_button').addEventListener('click', handleMapSendClick);
+  document.getElementById('testretrieve_button').addEventListener('click', handleTestRetrieveClick);
+
+</script>
+
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
