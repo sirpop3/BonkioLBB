@@ -13,19 +13,23 @@ const client = new Client({
 // Global Variables
 let DCBotReady = false;
 let bonkLoginToken = process.env.BonkLoginToken_LB;
+let downloadDataLocal = true;   // let bot updates local data with cloud upon startup
+
+void client.login(process.env.DCBOTTOKEN); // let bot login
 
 client.on("ready", (c) => {
     DCBotReady = true;
     console.log(`${c.user.username} is online.`);
-    
-    sendBonkInfo(); // call it 1st so I don't have to wait
+    if (downloadDataLocal) {
+
+    }
+    updateData();
 });
 
 client.on("messageCreate", (msg) => {
     if (msg.author.bot) {
         return;
     }
-    
     // ?Things to deal with messages in channel can go here
 });
 
@@ -145,9 +149,9 @@ printBonkPkrRooms = (roomsJSON) => {
     return roomsEmbed;
 }
 
-sendBonkInfo = async () => {
+updateData = async () => {
     let updateMsg = "Sending Bonk Info ";
-    setTimeout(sendBonkInfo, 10000); // too fast and the bot will get rate-limited by the server
+    setTimeout(updateData, 10000); // too fast and the bot will get rate-limited by the server
     const now = new Date();
     console.log(updateMsg.concat(now.getHours(),":", now.getMinutes(),":", now.getSeconds(),".",now.getMilliseconds()));
     let roomsEmbed = new EmbedBuilder()
@@ -185,6 +189,4 @@ sendBonkInfo = async () => {
     }
 };
 
-void client.login(process.env.DCBOTTOKEN); // Let the discord bot login
-
-let sendBonkInfoID = sendBonkInfo;
+let sendBonkInfoID = updateData;
