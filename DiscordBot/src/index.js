@@ -1,5 +1,7 @@
-require("dotenv").config(); // Put sensitive infos in this please!
-const { Client, IntentsBitField, EmbedBuilder } = require("discord.js");
+import * as dotenv from "dotenv";
+dotenv.config(); // loads .env file
+import {downloadMaps} from "./modules/maps.js";
+import { Client, IntentsBitField, EmbedBuilder } from "discord.js";
 
 const client = new Client({
     intents: [
@@ -13,17 +15,19 @@ const client = new Client({
 // Global Variables
 let DCBotReady = false;
 let bonkLoginToken = process.env.BonkLoginToken_LB;
-let downloadDataLocal = true;   // let bot updates local data with cloud upon startup
+let downloadDataLocal = true;   // let bot update local data with cloud upon startup
 
 void client.login(process.env.DCBOTTOKEN); // let bot login
 
 client.on("ready", (c) => {
     DCBotReady = true;
-    console.log(`${c.user.username} is online.`);
+    console.log(`${c.user.username} is Online.`);
     if (downloadDataLocal) {
-
+        console.log("Downloading Map data");
+        downloadMaps("src").then(r => updateData());
+    } else {
+        updateData();
     }
-    updateData();
 });
 
 client.on("messageCreate", (msg) => {
@@ -102,9 +106,8 @@ const getNewBLT = async () => {
 }
 
 // Prints Room info into Discord Channel
-printBonkPkrRooms = (roomsJSON) => {
+let printBonkPkrRooms = (roomsJSON) => {
     let roomsArray = roomsJSON.rooms;
-    
     let roomsEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle("Live Bonk Parkour Rooms:")
@@ -149,7 +152,7 @@ printBonkPkrRooms = (roomsJSON) => {
     return roomsEmbed;
 }
 
-updateData = async () => {
+let updateData = async () => {
     let updateMsg = "Sending Bonk Info ";
     setTimeout(updateData, 10000); // too fast and the bot will get rate-limited by the server
     const now = new Date();
@@ -175,7 +178,6 @@ updateData = async () => {
         console.log("failed getting bonk rooms");
         console.error(err);
     }
-    
     if (DCBotReady) {
         try {
             const channel = client.channels.cache.get('1122510728331542579');
@@ -189,4 +191,4 @@ updateData = async () => {
     }
 };
 
-let sendBonkInfoID = updateData;
+// let sendBonkInfoID = updateData;

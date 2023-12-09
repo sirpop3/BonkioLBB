@@ -169,7 +169,9 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import {getFirestore, collection, doc, setDoc, getDoc} from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js';
 
+
   const firebaseConfig = {
+    /*  FeiFei's Database Config
     apiKey: "AIzaSyAka60D6au7Y38SeWIBahUPG5tNcYAXSA8",
     authDomain: "bonkleaderboard.firebaseapp.com",
     projectId: "bonkleaderboard",
@@ -177,6 +179,14 @@
     messagingSenderId: "621980729647",
     appId: "1:621980729647:web:fa4b5a179f9cdb677161da",
     measurementId: "G-TJC3N4E459"
+     */
+    apiKey: "AIzaSyDBjDOXr82jzdBnb5vmasz0MX3E7suDv_k",
+    authDomain: "bonkio-mod-database.firebaseapp.com",
+    projectId: "bonkio-mod-database",
+    storageBucket: "bonkio-mod-database.appspot.com",
+    messagingSenderId: "950892818313",
+    appId: "1:950892818313:web:ecbd99457389ce709afb58",
+    measurementId: "G-9CQHHGKRSY"
   };
   const app = initializeApp(firebaseConfig);
 
@@ -190,15 +200,16 @@
     const mapNamesRef = collection(database, "mapNames");
     try {
       for (let i = 0; i < window.Data.length; i++) {
+        let prunedTitle = window.Data[i][0].replace("/", "_");  // '/' interacts with firebase hierarchy parsing
         setDoc(doc(mapNamesRef, i.toString()), {
-          mapName: window.Data[i][0]
+          mapName: prunedTitle
         });
       }
       setDoc(doc(mapNamesRef, "map count"), {
         mapCount: window.Data.length
       });
     } catch(e) {
-      alert(e);
+      //alert(e);
     }
     // create & populate MapData collection
     const mapDataRef = collection(database, "mapData");
@@ -216,7 +227,7 @@
           Parkour_Type: window.Data[i][6]
         });
       } catch (e) {
-        alert(title + ": " + e);
+        //alert(title + ": " + e);
         break;
       }
     }
